@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Interval Timer</title>
+  <style>
+    /* Import fonts*/
+    @import url('https://fonts.googleapis.com/css?family=Raleway|Roboto');
+
+    /* Global styles*/
+    body {
+      text-align: center;
+      margin: 0;
+      background: #31A620;
+      color: #99E98D;
+      font-family: 'Raleway', 'Roboto', 'Arial';
+    }
+
+    .hide {
+      display: none;
+    }
+
+    .container {
+      max-width: 550px;
+      margin: 0 auto;
+    }
+
+    /* Header styles*/
+    header {
+      background: #99E98D;
+      color: #31A620;
+      padding: 10px;
+      font-family: Raleway;
+      margin-bottom: 50px;
+    }
+
+    header .container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    header h1 {
+      margin: 0;
+    }
+
+    header img {
+      width: 60px;
+    }
+
+    /* Set time styles*/
+    input {
+      padding: 5px;
+      border: none;
+      color: #007700;
+      font-size: 25px;
+    }
+
+    .setTime {
+      margin: 0 auto;
+    }
+
+    .work,
+    .rest,
+    .round {
+      display: flex;
+      width: 100%;
+      justify-content: center;
+    }
+
+    .round > input {
+      flex-grow: 1;
+    }
+
+    .work-section, .rest-section {
+      display: flex;
+      margin: 3px;
+      flex-grow: 1;
+      flex-direction: column;
+      align-items: stretch;
+      justify-content: center;
+    }
+
+    button {
+      border: none;
+      width: calc(50%);
+      margin-top: 25px;
+      padding: 10px;
+      background: #99E98D;
+      color: #31A620;
+      font-size: 20px;
+      font-weight: bold;
+    }
+
+    button:hover {
+      background: rgba(153, 233, 141, 0.7);
+      cursor: pointer;
+    }
+
+    /* Start time styles*/
+    .startTime .container > * {
+      background: #99E98D;
+      color: #31A620;
+    }
+
+    .startTime h2.rounds {
+      display: flex;
+      width: 75px;
+      height: 75px;
+      margin: 0 auto;
+      border-radius: 50%;
+      font-size: 35px;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .counter {
+      padding: 25px;
+      margin: 20px 0;
+    }
+
+    .counter h2.counter-name {
+      margin: 0;
+      margin-bottom: 15px;
+      font-size: 28px;
+    }
+
+    .counter .counter-time span {
+      font-size: 75px;
+      font-weight: bold;
+    }
+
+    /* Blue theme styles*/
+    body.blue {
+      background: #26BEE8;
+      color: #CAE8E8;
+    }
+
+    .rounds.blue, header.blue, .counter.blue {
+      color: #26BEE8;
+      background: #CAE8E8;
+    }
+
+    /* Media queries */
+    @media(max-width: 650px){
+      .container {
+        width: 90%;
+      }
+      header .container {
+        justify-content: center;
+      }
+      header img {
+        margin-right: 20px
+      }
+      header img:last-child {
+        display: none;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <div class="container">
+      <img src="#">
+      <h1>Interval Timer</h1>
+      <img src="#">
+    </div>
+  </header>
+  <div class="setTime">
+    <div class="container">
+      <h2>Number of Sets</h2>
+      <div class="round">
+        <input type="number" value="6" min="1" step="1" id="input-round">
+      </div>
+      <h2>Work Time</h2>
+      <div class="work">
+        <div class="work-section min">
+          <label for="input-work-minute">Minutes</label>
+          <input type="number" value="0" min="0" step="1" id="input-work-minute">
+        </div>
+        <div class="work-section sec">
+          <label for="input-work-second">Seconds</label>
+          <input type="number" value="20" min="0" max="60" step="1" id="input-work-second">
+        </div>
+      </div>
+      <h2>Rest Time</h2>
+      <div class="rest">
+        <div class="rest-section min">
+          <label for="input-work-minute">Minutes</label>
+          <input type="number" value="0" min="0"step="1" id="input-rest-minute">
+        </div>
+        <div class="rest-section sec">
+          <label for="input-work-second">Seconds</label>
+          <input type="number" value="10" min="0" max="60" step="1" id="input-rest-second">
+        </div>
+      </div>
+      <button type="button">GO</button>
+    </div>
+  </div>
+
+  <div class="startTime hide">
+    <div class="container">
+      <h2 class="rounds">3</h2>
+      <div class="counter">
+        <h2 class="counter-name">Work</h2>
+        <div class="counter-time">
+          
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script>
+    // Variables
+    const setTime = $('.setTime');
+    const startTime = $('.startTime');
+    const btn = $('button');
+    let changeWorkIntvl = null;
+    let workSecs = 0;
+    let restSecs = 0;
+    let workSeconds = 0;
+    let restSeconds = 0;
+    let round = 0;
+    let rounds = 0;
+    let totalTim = 0;
+    let totalTime = 0;
+    let totalSec = 0;
+    let totalMin = 0;
+    let totalIntvl = null;
+
+    function changeTotal(){
+      if(totalTime <= 0){
+        clearInterval(totalIntvl);
+      }
+      totalMin = Math.floor(totalTime / 60);
+      totalSec = totalTime % 60;
+      totalTime--;
+    }
+
+    // Change the work time
+    function changeWork(){
+      $('.counter-name')[0].innerHTML = 'Work';
+      $('.rounds')[0].innerHTML = rounds;
+      const minutes = Math.floor(workSeconds / 60);
+      const seconds = (workSeconds % 60);
+      if(rounds > 0 && workSeconds > 0){
+        $('.counter-time')[0].innerHTML = `
+          <span>${("0" + minutes).slice(-2)}:</span>
+          <span>${("0" + seconds).slice(-2)}</span>
+          <p>${('0'+totalMin).slice(-2)}:${('0'+totalSec).slice(-2)}</p>
+        `;
+      } else if(rounds == 1){
+        resetTimer();
+        workIntvlManager(false);
+      } else {
+        restIntvlManager(true);
+        changeTheme();
+        workIntvlManager(false);
+      }
+      workSeconds--;
+    }
+
+    // Change the rest time
+    function changeRest(){
+      $('.counter-name')[0].innerHTML = 'Rest';
+      const minutes = Math.floor(restSeconds / 60);
+      const seconds = Math.floor(restSeconds % 60);
+      if(rounds > 0 && restSeconds > 0){
+        $('.counter-time')[0].innerHTML = `
+          <span>${("0" + minutes).slice(-2)}:</span>
+          <span>${("0" + seconds).slice(-2)}</span>
+          <p>${('0'+totalMin).slice(-2)}:${('0'+totalSec).slice(-2)}</p>
+        `;
+      } else {
+        workIntvlManager(true);
+        changeTheme();
+        restIntvlManager(false);
+      }
+      restSeconds--;
+    }
+
+    // Reset the timer and display restart option
+    function resetTimer(){
+      $('.rounds').css('display', 'none');
+      $('.counter-name').css('display', 'none');
+      $('.counter-time')[0].innerHTML = '<span>Congo!</span><p>Your workout is complete</p><button style="background-color:#31A620;color:#99E98D" onclick=\'rounds=round;totalTime = totalTim;changeTotal();totalIntvl=window.setInterval(changeTotal,1000);workIntvlManager(true);$(".rounds").css("display", "flex");$(".counter-name").css("display", "block")\'>RESTART</button>';
+    }
+
+    // Change theme function
+    function changeTheme(){
+      if($('header').hasClass('blue')){
+        $('header').removeClass('blue');
+        $('.counter').removeClass('blue');
+        $('body').removeClass('blue');
+        $('.rounds').removeClass('blue');
+      } else {
+        $('header').addClass('blue');
+        $('.counter').addClass('blue');
+        $('body').addClass('blue');
+        $('.rounds').addClass('blue');
+      }
+    }
+
+    // Event listeners
+    btn.on('click', (e) => {
+      startTime.removeClass('hide');
+      setTime.addClass('hide');
+
+      round = $('#input-round')[0].value;
+      workSecs = Number($('#input-work-second')[0].value) + (Number($('#input-work-minute')[0].value) * 60);
+      restSecs = Number($('#input-rest-second')[0].value) + (Number($('#input-rest-minute')[0].value) * 60);
+      totalTim = (workSecs * round) + (restSecs * (round-1));
+
+      rounds = round;
+      totalTime = totalTim;
+      changeTotal();
+      totalIntvl = window.setInterval(changeTotal, 1000);
+      workIntvlManager(true);
+    });
+
+    // Work interval manager function
+    function workIntvlManager(flag){
+      if(flag){
+        workSeconds = workSecs;
+        changeWork();
+        changeWorkIntvl = window.setInterval(changeWork, 1000);
+      } else {
+        clearInterval(changeWorkIntvl);
+      }
+    }
+
+    // Rest interval manager function
+    function restIntvlManager(flag){
+      if(flag){
+        restSeconds = restSecs;
+        changeRest();
+        rounds--;
+        changeRestIntvl = window.setInterval(changeRest, 1000);
+      } else {
+        clearInterval(changeRestIntvl);
+      }
+    }
+  </script>
+</body>
+
+</html>
